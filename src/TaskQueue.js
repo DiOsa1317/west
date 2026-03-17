@@ -42,8 +42,8 @@ export default class TaskQueue {
                 dispose
             });
         }
-    }
-
+        runNextTask(this);
+    };
     continueWith(action) {
         this.push(action, null, 0);
     }
