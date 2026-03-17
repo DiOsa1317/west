@@ -124,17 +124,22 @@ class Lad extends Dog {
         }
         return [super.getDescriptions(), "Чем их больше, тем они сильнее"];
     }
-
 }
 
+class PseudoDuck extends Dog {
+    constructor(name = 'Псевдоутка', maxPower = 3) {
+        super(name, maxPower);
+    }
+    quacks() { console.log('quack') };
+    swims() { console.log('float: both;') };
+}
 const seriffStartDeck = [
-    new Duck(),
-    new Duck(),
     new Duck(),
 ];
 const banditStartDeck = [
-    new Lad(),
-    new Lad(),
+    new Dog(),
+    new PseudoDuck(),
+    new Dog(),
 ];
 
 // Создание игры.
