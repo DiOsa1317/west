@@ -44,7 +44,7 @@ class Gatling extends Creature {
         const allOppositeCards = gameContext.oppositePlayer.table;
         const taskQueue = new TaskQueue();
 
-        for(let position = 0; position < allOppositeCards.length; position++) {
+        for (let position = 0; position < allOppositeCards.length; position++) {
             taskQueue.push(onDone => {
                 const oppositeCard = allOppositeCards[position];
                 if (oppositeCard) {
@@ -88,17 +88,55 @@ class Trasher extends Dog {
         return [super.getDescriptions(), 'Описание способности:\n Получает на 1 меньше урона'];
     }
 }
+
+class Lad extends Dog {
+    constructor(name = 'Браток', maxPower = 2) {
+        super(name, maxPower);
+    }
+    static inGameCount;
+    static getInGameCount() { return this.inGameCount || 0; }
+    static setInGameCount(value) { this.inGameCount = value; }
+
+    doAfterComingIntoPlay(continuation) {
+        Lad.setInGameCount(Lad.getInGameCount() + 1);
+        continuation();
+    }
+    doBeforeRemoving(continuation) {
+        Lad.setInGameCount(Math.max(Lad.getInGameCount() - 1, 0));
+        continuation();
+    }
+    static getBonus() {
+        const currentCount = this.getInGameCount();
+        return currentCount * (currentCount + 1) / 2;
+    }
+
+    modifyDealedDamageToCreature(value, toCard, gameContext, continuation) {
+        continuation(value + Lad.getBonus());
+    }
+
+    modifyTakenDamage(value, fromCard, gameContext, continuation) {
+        continuation(value - Lad.getBonus());
+    }
+
+    getDescriptions() {
+        if (!Lad.prototype.hasOwnProperty('modifyDealedDamageToCreature')) {
+            return super.getDescriptions();
+        }
+        return [super.getDescriptions(), "Чем их больше, тем они сильнее"];
+    }
+
+}
+
 const seriffStartDeck = [
     new Duck(),
     new Duck(),
     new Duck(),
-    new Gatling(),
 ];
 const banditStartDeck = [
-    new Trasher(),
-    new Dog(),
-    new Dog(),
+    new Lad(),
+    new Lad(),
 ];
+
 // Создание игры.
 const game = new Game(seriffStartDeck, banditStartDeck);
 
