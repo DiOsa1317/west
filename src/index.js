@@ -36,6 +36,27 @@ class Creature extends Card {
     }
 }
 
+class Gatling extends Creature {
+    constructor(name = 'Гатлинг', maxPower = 6) {
+        super(name, maxPower);
+    }
+    attack(gameContext, continuation) {
+        const allOppositeCards = gameContext.oppositePlayer.table;
+        const taskQueue = new TaskQueue();
+
+        for(let position = 0; position < allOppositeCards.length; position++) {
+            taskQueue.push(onDone => {
+                const oppositeCard = allOppositeCards[position];
+                if (oppositeCard) {
+                    this.dealDamageToCreature(2, oppositeCard, gameContext, onDone);
+                } else {
+                    onDone();
+                }
+            });
+        }
+        taskQueue.continueWith(continuation);
+    }
+}
 class Duck extends Creature {
     constructor(name = 'Мирная утка', maxPower = 2) {
         super(name, maxPower);
@@ -53,7 +74,7 @@ class Dog extends Creature {
 }
 
 class Trasher extends Dog {
-    constructor(name = ' Громила', maxPower = 5) {
+    constructor(name = 'Громила', maxPower = 5) {
         super(name, maxPower);
     }
 
@@ -67,19 +88,17 @@ class Trasher extends Dog {
         return [super.getDescriptions(), 'Описание способности:\n Получает на 1 меньше урона'];
     }
 }
-// Колода Шерифа, нижнего игрока.
 const seriffStartDeck = [
     new Duck(),
     new Duck(),
     new Duck(),
+    new Gatling(),
 ];
-
-// Колода Бандита, верхнего игрока.
 const banditStartDeck = [
     new Trasher(),
+    new Dog(),
+    new Dog(),
 ];
-
-
 // Создание игры.
 const game = new Game(seriffStartDeck, banditStartDeck);
 
