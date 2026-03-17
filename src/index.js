@@ -133,12 +133,43 @@ class PseudoDuck extends Dog {
     quacks() { console.log('quack') };
     swims() { console.log('float: both;') };
 }
+
+class Brewer extends Duck {
+    constructor(name = 'Пивовар', maxPower = 2) {
+        super(name, maxPower);
+    }
+    doBeforeAttack(gameContext, continuation) {
+        const {currentPlayer, oppositePlayer, position, updateView} = gameContext;
+        const allCards = currentPlayer.table.concat(oppositePlayer.table)
+
+        const taskQueue = new TaskQueue();
+
+        for (let position = 0; position < allCards.length; position++) {
+            taskQueue.push(onDone => {
+                const card = allCards[position];
+                if (card) {
+                    card.maxPower++;
+                    card.currentPower += 2;
+                    card.view.signalHeal()
+                    card.updateView()
+                } else {
+                    onDone();
+                }
+            });
+        }
+        taskQueue.continueWith(continuation);
+
+    }
+}
+
 const seriffStartDeck = [
     new Duck(),
+    new Brewer(),
 ];
 const banditStartDeck = [
     new Dog(),
-    new PseudoDuck(),
+    new Dog(),
+    new Dog(),
     new Dog(),
 ];
 
