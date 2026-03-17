@@ -97,7 +97,7 @@ class Lad extends Dog {
     static getInGameCount() { return this.inGameCount || 0; }
     static setInGameCount(value) { this.inGameCount = value; }
 
-    doAfterComingIntoPlay(continuation) {
+    doAfterComingIntoPlay(gameContext, continuation) {
         Lad.setInGameCount(Lad.getInGameCount() + 1);
         continuation();
     }
